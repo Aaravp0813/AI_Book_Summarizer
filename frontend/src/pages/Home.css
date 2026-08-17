@@ -1,0 +1,16 @@
+.home-page {
+  width: 100%;
+  padding: var(--spacing-xl) var(--spacing-md);
+  flex: 1;
+}
+
+.home-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .home-page {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+}

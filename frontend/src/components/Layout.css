@@ -1,0 +1,28 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+}
+
+.main-content {
+  flex: 1;
+  padding: var(--spacing-xl) var(--spacing-md);
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.footer {
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing-lg) var(--spacing-md);
+  text-align: center;
+  margin-top: auto;
+}
+
+.footer p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
