@@ -7,18 +7,22 @@ const API_BASE_URL = 'http://127.0.0.1:8000';
 
 /**
  * Ask a question to the tutor
+ * @param {string} subject - The selected subject (science, maths, social_science, english)
  * @param {string} question - The student's question
  * @returns {Promise<{question: string, answer: string}>}
  * @throws {Error} If the request fails or server returns an error
  */
-export async function askQuestion(question) {
+export async function askQuestion(subject, question) {
   try {
     const response = await fetch(`${API_BASE_URL}/ask`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ question: question.trim() }),
+      body: JSON.stringify({ 
+        subject: subject.trim(),
+        question: question.trim() 
+      }),
     });
 
     // Parse the response body once

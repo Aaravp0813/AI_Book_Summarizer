@@ -2,37 +2,99 @@
 
 ## 1. Project Overview
 
-Build a local React + Vite frontend for an AI-powered study tutor focused specifically on the **NCERT Grade 8 Science textbook**.
+Build and integrate a local React + Vite frontend for an AI-powered study tutor focused on the **NCERT Grade 8 Science textbook**.
 
-The frontend will communicate with an existing local FastAPI backend.
+The frontend communicates with an existing local FastAPI backend.
 
-The backend already performs:
+The backend is responsible for:
 
-1. User question reception.
-2. FAISS similarity search over the NCERT textbook.
-3. Retrieval of the most relevant textbook chunks.
-4. Gemini generation using the retrieved context.
-5. Returning the question and generated answer.
+1. Receiving the student's question.
+2. Searching the NCERT FAISS vector database.
+3. Retrieving relevant textbook chunks.
+4. Sending the retrieved context to Gemini.
+5. Returning the generated answer to the frontend.
 
-The frontend must focus on providing a polished, responsive, modern interface for interacting with this backend.
+The frontend is responsible for:
+
+1. Providing the user interface.
+2. Collecting the student's question.
+3. Sending the question to FastAPI.
+4. Showing loading, success, and error states.
+5. Displaying the generated answer clearly.
+
+The project is currently being developed locally.
 
 ---
 
-## 2. Existing Backend Contract
+## 2. Critical Implementation Rule
 
-The backend is available locally at:
+Before making changes, **inspect the entire project**.
 
-`http://127.0.0.1:8000`
+Do not assume that the project is empty.
+
+For every planned step:
+
+* If it is already correctly implemented, skip it.
+* If it is partially implemented, complete only what is missing.
+* If it is incorrect, fix it.
+* If it does not exist, create it.
+* Do not overwrite working code unnecessarily.
+* Do not create duplicate files or duplicate functionality.
+* Do not reinstall dependencies that are already correctly installed.
+* Do not rebuild the FAISS database unless necessary.
+* Do not rewrite the FastAPI backend merely to implement the frontend.
+
+The **actual state of the project takes precedence over this plan**.
+
+---
+
+## 3. Entire Project Structure
+
+The project root is:
+
+```text
+E:\My_Projects\AI_Book_Summarizer\
+```
+
+The project may contain:
+
+```text
+AI_Book_Summarizer/
+├── main.py
+├── Book_Summarizer.py
+├── faiss_ncert_db/
+├── frontend/
+├── .env
+├── plan.md
+├── instruction.md
+└── other project files
+```
+
+Copilot must inspect the actual directory structure before making changes.
+
+---
+
+## 4. Existing Backend Contract
+
+The backend is expected to run locally at:
+
+```text
+http://127.0.0.1:8000
+```
 
 Main endpoint:
 
-`POST /ask`
+```text
+POST /ask
+```
 
 Full endpoint:
 
-`http://127.0.0.1:8000/ask`
+```text
+http://127.0.0.1:8000/ask
+```
 
-Request body:
+Current request format:
 
 ```json
 {
@@ -40,7 +102,7 @@ Request body:
 }
 ```
 
-Successful response:
+Current successful response:
 
 ```json
 {
@@ -57,18 +119,19 @@ Possible error response:
 }
 ```
 
+The frontend must communicate with FastAPI only.
+
 The frontend must never directly access:
 
-* the Gemini API
+* Gemini
 * the Gemini API key
-* the FAISS database
+* FAISS
 * the NCERT ZIP archive
-
-The frontend communicates only with FastAPI.
+* backend `.env` secrets
 
 ---
 
-## 3. Technology Constraints
+## 5. Technology
 
 Use:
 
@@ -76,7 +139,7 @@ Use:
 * Vite
 * JavaScript
 * JSX
-* Normal CSS
+* standard CSS
 
 Do not introduce:
 
@@ -87,32 +150,45 @@ Do not introduce:
 * unnecessary UI frameworks
 * unnecessary dependencies
 
-Keep the frontend lightweight.
+Keep the application lightweight.
 
 ---
 
-## 4. Initial Project State
+## 6. Frontend Starting State
 
 The `frontend` directory already exists and was created using Vite.
 
-The developer has NOT yet:
+Before implementation, inspect:
 
-* run `npm install`
-* created custom components
-* created pages
-* created the API service
-* created custom CSS
-* copied any generated frontend files
+```text
+frontend/package.json
+frontend/src/
+frontend/index.html
+frontend/vite.config.*
+```
 
-Therefore, build the frontend cleanly from the existing Vite scaffold.
+Determine:
 
-Do not assume any custom files already exist.
+* whether dependencies are already installed
+* which React/Vite versions are being used
+* which starter files exist
+* whether any frontend code has already been written
+
+If dependencies are not installed, run:
+
+```bash
+npm install
+```
+
+If they are already installed and correct, skip installation.
+
+Do not replace Vite or change versions unless there is a genuine compatibility problem.
 
 ---
 
-## 5. Target Folder Structure
+## 7. Target Frontend Architecture
 
-Create this structure:
+The desired architecture is:
 
 ```text
 frontend/
@@ -150,11 +226,13 @@ frontend/
 └── vite.config.js
 ```
 
-Modify the structure only when there is a strong technical reason.
+This is a target, not a requirement to blindly recreate every file.
+
+If equivalent files/components already exist, reuse and improve them.
 
 ---
 
-## 6. Component Responsibilities
+## 8. Component Responsibilities
 
 ### Layout
 
@@ -162,26 +240,25 @@ Responsible for:
 
 * page shell
 * header placement
-* main content area
+* main content
 * footer
-* shared application structure
+* overall structure
 
-It should not contain the tutoring logic.
+It should not contain the tutoring/API logic.
 
 ### Header
 
 Display:
 
-* application name
-* "AI Study Tutor" label
-* "NCERT Grade 8 Science" identification
-* clean branding
+* NCERT AI Tutor
+* AI Study Tutor
+* NCERT Grade 8 Science
 
-The design should make it obvious that this is an educational NCERT tool rather than a generic AI chatbot.
+It should clearly identify the educational purpose of the application.
 
 ### TopicChips
 
-Display example questions or topics based on NCERT Grade 8 Science.
+Display example Grade 8 Science questions/topics.
 
 Examples:
 
@@ -200,126 +277,115 @@ Clicking a chip should populate the question input.
 
 Responsible for:
 
-* multiline question input
+* multiline textarea
 * submit button
-* disabled state while loading
+* empty-question validation
+* loading/disabled state
 * keyboard-friendly interaction
-* validation for empty questions
+* responsive behavior
 
 ### AnswerPanel
 
-Handle these states:
+Support:
 
 1. Idle
 2. Loading
 3. Success
 4. Error
 
-The success state should present the answer in a comfortable reading layout.
-
-The loading state should clearly communicate that the tutor is processing the question.
-
-The error state should display a useful human-readable message and allow retrying.
+The answer must be presented in a readable study-friendly format.
 
 ### Home
 
-Own the main page state:
+Own the main tutoring state:
 
-* current question
-* current answer
-* loading state
-* error state
+* question
+* answer
+* loading
+* error
 
-It should call the API service rather than directly using `fetch()` inside multiple UI components.
+It should communicate with the API service rather than using `fetch()` throughout UI components.
 
 ### API Service
 
-`src/services/api.js` must contain the FastAPI communication.
+Create:
 
-Use:
+```text
+src/services/api.js
+```
+
+if it does not exist.
+
+It is responsible for communicating with:
 
 ```text
 http://127.0.0.1:8000/ask
 ```
 
-POST:
+It should:
 
-```json
-{
-  "question": "..."
-}
-```
-
-Return:
-
-```json
-{
-  "question": "...",
-  "answer": "..."
-}
-```
-
-Handle network errors and non-successful HTTP responses.
+* send POST JSON
+* parse JSON
+* handle network failures
+* handle non-2xx responses
+* use backend `detail` information when available
 
 ---
 
-## 7. Visual Design
+## 9. Visual Design
 
-The application should be:
+The website should be:
 
 * dark themed
 * modern
 * clean
 * readable
-* educational
 * professional
+* educational
 * understated
 
 Avoid:
 
 * excessive gradients
-* neon cyberpunk styling
+* neon/cyberpunk styling
+* excessive glow
 * excessive glassmorphism
-* giant rounded cards everywhere
+* oversized cards
 * excessive animation
 * visual clutter
 
-The design should feel suitable for a student using it for extended study sessions.
+The interface should be comfortable for long study sessions.
 
 ---
 
-## 8. Typography
+## 10. Typography
 
 Prioritize readability.
 
-Use a modern readable font stack.
+Use:
 
-Recommended conceptual roles:
+* clear heading hierarchy
+* comfortable body font size
+* comfortable line height
+* reasonable paragraph width
+* readable controls
 
-* display/headings: modern geometric sans-serif
-* body: highly readable sans-serif
-* tiny metadata/badges: optional monospace
-
-Avoid excessively thin text.
-
-Use comfortable:
-
-* font sizes
-* line heights
-* paragraph widths
-* spacing
+Avoid overly thin or tiny body text.
 
 ---
 
-## 9. Color System
+## 11. Color System
 
-Use CSS variables in `global.css`.
+Use CSS variables in:
+
+```text
+src/styles/global.css
+```
 
 Define variables for:
 
 * page background
-* elevated background
-* panel background
+* surfaces
 * primary text
 * secondary text
 * muted text
@@ -327,13 +393,17 @@ Define variables for:
 * accent
 * success
 * error
-* focus state
+* focus
+* spacing
+* radius
+* typography
+* shadows
 
-Do not repeatedly hard-code colors throughout individual CSS files.
+Avoid repeatedly hard-coding identical values.
 
 ---
 
-## 10. Responsive Design
+## 12. Responsive Design
 
 Support:
 
@@ -342,118 +412,171 @@ Support:
 * tablet
 * mobile
 
-The main content should have a reasonable maximum width.
+Ensure:
 
-The question input should remain comfortable on narrow screens.
-
-Buttons and controls must remain usable on touch devices.
+* question input remains usable on small screens
+* buttons remain touch-friendly
+* no horizontal overflow occurs
+* content spacing adapts appropriately
 
 ---
 
-## 11. Accessibility
+## 13. Accessibility
 
 Use:
 
 * semantic HTML
-* visible labels or accessible labels
-* descriptive button text
-* keyboard navigation
+* accessible labels
+* descriptive buttons
 * visible focus states
-* sufficient color contrast
+* keyboard navigation
+* sufficient contrast
 
-Do not rely only on color to communicate loading, error, or success.
-
----
-
-## 12. API Integration
-
-The frontend should be connected to the real backend rather than mocked.
-
-Do not implement a fake response layer once the UI is functional.
-
-Use a central API service:
-
-```text
-src/services/api.js
-```
-
-Do not put the Gemini API key anywhere in the frontend.
+Do not rely solely on color for status information.
 
 ---
 
-## 13. Error Handling
+## 14. Error Handling
 
-Handle at least:
+Handle:
 
 ### Empty question
 
-Show a clear validation message.
+Show an understandable validation message.
 
 ### Backend unavailable
 
-Display something like:
+Display a clear message such as:
 
-"Couldn't reach the tutor server. Make sure the FastAPI backend is running."
+> Couldn't reach the tutor server. Make sure the FastAPI backend is running.
 
-### HTTP error
+### Backend HTTP error
 
-Display the backend's `detail` message when available.
+Display the backend `detail` message when available.
 
 ### Unexpected response
 
-Fail gracefully rather than crashing the application.
+Fail gracefully rather than crashing.
 
 ---
 
-## 14. Development Sequence
+## 15. Backend and Frontend Separation
 
-Implement in this order:
+Backend:
 
-### Step 1
+```text
+main.py
+```
 
-Inspect the existing Vite scaffold.
+is responsible for:
 
-### Step 2
+```text
+Question
+  ↓
+FAISS
+  ↓
+NCERT context
+  ↓
+Gemini
+  ↓
+Answer
+```
 
-Run:
+Frontend:
+
+```text
+frontend/
+```
+
+is responsible for:
+
+```text
+User
+  ↓
+React
+  ↓
+FastAPI
+  ↓
+React
+```
+
+Do not move FAISS or Gemini logic into React.
+
+Do not expose the Gemini API key.
+
+---
+
+## 16. Development Workflow
+
+### Step 1 — Inspect
+
+Inspect the entire repository.
+
+Identify:
+
+* existing backend
+* existing FAISS database
+* indexing script
+* `.env`
+* frontend state
+* installed dependencies
+* existing React components
+* existing CSS
+
+### Step 2 — Determine Completed Work
+
+Compare the real project state against this plan.
+
+Mark each task internally as:
+
+* Complete
+* Partial
+* Missing
+* Broken
+
+### Step 3 — Install Dependencies Only If Needed
+
+If `frontend/node_modules` is absent or dependencies are not installed:
 
 ```bash
 npm install
 ```
 
-### Step 3
+Otherwise skip.
 
-Create folders and components.
+### Step 4 — Implement Missing Frontend Pieces
 
-### Step 4
+Create only missing files.
 
-Build global styling and theme.
+Modify only files that actually need changes.
 
-### Step 5
+### Step 5 — Connect API
 
-Build Layout and Header.
+Implement or fix:
 
-### Step 6
+```text
+src/services/api.js
+```
 
-Build Home page.
+Use the existing FastAPI `/ask` contract.
 
-### Step 7
+### Step 6 — Integrate Components
 
-Build QuestionInput and TopicChips.
+Connect:
 
-### Step 8
+```text
+Layout
+Header
+TopicChips
+QuestionInput
+AnswerPanel
+Home
+App
+```
 
-Build AnswerPanel states.
+only where they are required.
 
-### Step 9
-
-Implement `api.js`.
-
-### Step 10
-
-Connect Home to the API.
-
-### Step 11
+### Step 7 — Validate
 
 Run:
 
@@ -461,41 +584,42 @@ Run:
 npm run dev
 ```
 
-### Step 12
+Test the UI.
 
-Test against:
+If backend testing is required:
 
-```text
-http://127.0.0.1:8000
+```bash
+python -m uvicorn main:app --reload
 ```
 
 ---
 
-## 15. Acceptance Criteria
+## 17. Acceptance Criteria
 
-The frontend is considered complete when:
+The frontend is complete when:
 
 * `npm run dev` starts successfully.
+* Existing working functionality has not been unnecessarily broken.
 * There are no React import errors.
-* There are no browser console errors caused by the frontend.
+* There are no frontend runtime errors.
 * The page is responsive.
 * The dark theme is consistent.
-* The application clearly identifies itself as an NCERT Grade 8 Science AI tutor.
-* Topic chips populate the question input.
-* The user can submit a question.
-* A loading state appears.
+* The application clearly identifies itself as an NCERT Grade 8 Science tutor.
+* Topic chips work.
+* A student can enter a question.
+* Loading state appears during the API request.
 * The question is sent to `POST /ask`.
 * The returned answer is displayed.
-* Backend errors are displayed gracefully.
-* No Gemini key exists in the frontend.
+* Backend errors are handled gracefully.
+* No Gemini API key exists in the frontend.
 * No FAISS logic exists in the frontend.
-* Components remain separated and maintainable.
+* The architecture remains maintainable.
 
 ---
 
-## 16. Future Expansion
+## 18. Future Expansion
 
-Design the code so the following can be added later without major restructuring:
+Keep the architecture easy to extend later with:
 
 * chat history
 * chapter selection
@@ -503,9 +627,65 @@ Design the code so the following can be added later without major restructuring:
 * summary mode
 * explanation mode
 * quiz mode
-* study progress
 * saved questions
+* study progress
 * authentication
 * additional NCERT subjects
 
-Do not implement these features yet unless explicitly requested.
+Do not implement future features unless explicitly requested.
+
+---
+
+## 19. Final Rule
+
+**Inspect first. Reuse existing work. Skip completed steps. Fix incomplete work. Create only what is missing. Do not rewrite functioning code without a reason.**
+
+## Existing Science Vector Database — Reference Implementation
+
+The **NCERT Grade 8 Science FAISS database has already been created successfully**.
+
+The existing Science database is the reference implementation for all other subjects.
+
+Do NOT rebuild, regenerate, overwrite, or otherwise modify the existing Science database during this task.
+
+When extending the indexing system to other subjects, use the **same indexing methodology already used to create the Science database**, including:
+
+- PDF text extraction method
+- chunk size
+- chunk overlap
+- text formatting
+- embedding model
+- embedding batch size
+- retry/rate-limit handling
+- FAISS construction method
+- metadata/source handling, if already present
+
+The goal is to generalize the existing Science indexing pipeline rather than create a different indexing pipeline for each subject.
+
+The intended architecture is:
+
+Science
+  ↓
+Existing indexing pipeline
+  ↓
+Science FAISS database ✅ already exists
+
+Mathematics
+  ↓
+Same indexing pipeline
+  ↓
+Mathematics FAISS database
+
+Social Science
+  ↓
+Same indexing pipeline
+  ↓
+Social Science FAISS database
+
+English
+  ↓
+Same indexing pipeline
+  ↓
+English FAISS database
+
+The existing Science database must remain untouched during this task.

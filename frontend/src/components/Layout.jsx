@@ -1,10 +1,10 @@
 import Header from './Header';
 import './Layout.css';
 
-export default function Layout({ children }) {
+export default function Layout({ children, subject, onChangeSubject }) {
   return (
     <div className="layout">
-      <Header />
+      <Header subject={subject} onChangeSubject={onChangeSubject} />
       <main className="main-content">
         {children}
       </main>

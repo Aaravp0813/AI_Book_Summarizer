@@ -2,53 +2,83 @@
 
 ## Role
 
-You are working as the frontend engineer for a local React + Vite application called:
+Act as the frontend engineer for a local React + Vite application called:
 
 **NCERT AI Tutor**
 
-The application is specifically designed to help students study the **NCERT Grade 8 Science textbook**.
+The application helps students study the **NCERT Grade 8 Science textbook**.
 
-Build the frontend directly in the existing Vite project.
-
----
-
-## Critical Starting Assumptions
-
-The frontend folder already exists.
-
-However:
-
-* `npm install` has NOT been run yet.
-* Custom React components do NOT exist yet.
-* Custom CSS does NOT exist yet.
-* The API service does NOT exist yet.
-* No code from another frontend implementation has been copied.
-* Do not assume Claude-generated files exist.
-* Do not assume custom files already exist.
-
-First inspect the existing project before modifying it.
+You are working inside an existing project, not a blank project.
 
 ---
 
-## Project Location
+## 1. Inspect the Entire Project First
 
-The project is currently under:
+Before changing anything, inspect the entire project rooted at:
 
 ```text
 E:\My_Projects\AI_Book_Summarizer\
 ```
 
-The frontend is:
+Inspect, where present:
 
 ```text
-E:\My_Projects\AI_Book_Summarizer\frontend\
+main.py
+Book_Summarizer.py
+faiss_ncert_db/
+frontend/
+frontend/package.json
+frontend/src/
+frontend/index.html
+frontend/vite.config.*
+.env
+plan.md
+instruction.md
 ```
 
-Do not move the frontend.
+Also inspect relevant files nested inside `frontend/src`.
+
+### Do NOT assume:
+
+* the frontend is empty
+* dependencies are missing
+* files do not exist
+* the backend needs modification
+* FAISS needs rebuilding
+
+The repository's actual state is authoritative.
 
 ---
 
-## Technology
+## 2. Skip Completed Work
+
+For every task you consider:
+
+### Already correct
+
+Skip it.
+
+### Partially implemented
+
+Complete only the missing pieces.
+
+### Incorrect
+
+Fix it.
+
+### Missing
+
+Create it.
+
+### Existing but unnecessary
+
+Do not duplicate it.
+
+Never recreate a working component merely because this instruction document lists a target filename.
+
+---
+
+## 3. Project Technology
 
 Use:
 
@@ -56,7 +86,7 @@ Use:
 * Vite
 * JavaScript
 * JSX
-* CSS
+* standard CSS
 
 Do not use:
 
@@ -64,104 +94,60 @@ Do not use:
 * Tailwind
 * Bootstrap
 * Material UI
-* unnecessary third-party UI packages
+* unnecessary UI libraries
 
-Avoid adding dependencies unless they are genuinely required.
+Do not add dependencies unless genuinely required.
 
 ---
 
-## Installation
+## 4. Dependency Installation
 
-Before implementation, ensure project dependencies are installed:
+Inspect:
+
+```text
+frontend/package.json
+```
+
+and determine whether dependencies are installed.
+
+If installation is required:
 
 ```bash
 npm install
 ```
 
-Do not reinstall Node.js.
+If dependencies are already installed and correct:
 
-Do not replace Vite unless there is an actual compatibility problem.
+**Do not run unnecessary installation commands.**
 
----
+Do not replace Vite unless a real compatibility problem exists.
 
-## Architecture
-
-Use this target architecture:
-
-```text
-src/
-├── components/
-│   ├── Layout.jsx
-│   ├── Layout.css
-│   ├── Header.jsx
-│   ├── Header.css
-│   ├── TopicChips.jsx
-│   ├── TopicChips.css
-│   ├── QuestionInput.jsx
-│   ├── QuestionInput.css
-│   ├── AnswerPanel.jsx
-│   └── AnswerPanel.css
-│
-├── pages/
-│   ├── Home.jsx
-│   └── Home.css
-│
-├── services/
-│   └── api.js
-│
-├── styles/
-│   └── global.css
-│
-├── App.jsx
-└── main.jsx
-```
+Do not change versions without a technical reason.
 
 ---
 
-## Component Rules
+## 5. Backend
 
-### Do not create one giant App.jsx
-
-`App.jsx` should remain a thin root component.
-
-### Keep state where it belongs
-
-The Home page should manage:
-
-* question
-* answer
-* loading
-* error
-
-Reusable components should receive props and callbacks.
-
-### Keep networking out of UI components
-
-Do not put `fetch()` directly into `QuestionInput.jsx`.
-
-Networking belongs in:
+The existing backend is:
 
 ```text
-src/services/api.js
+main.py
 ```
 
----
-
-## API Contract
-
-The backend is:
+It should expose:
 
 ```text
-http://127.0.0.1:8000
+GET /
+POST /ask
 ```
 
-The question endpoint is:
+Main endpoint:
 
 ```text
-POST http://127.0.0.1:8000/ask
+http://127.0.0.1:8000/ask
 ```
 
-Request:
+Current request:
 
 ```json
 {
@@ -169,7 +155,7 @@ Request:
 }
 ```
 
-Response:
+Current response:
 
 ```json
 {
@@ -186,261 +172,344 @@ Error example:
 }
 ```
 
-The frontend should use the response's `answer` field.
+### Backend Rule
+
+Do not redesign or rewrite `main.py` as part of the frontend task.
+
+Only modify backend code if inspection reveals a real incompatibility that prevents the frontend from functioning.
+
+If modification is required, make the smallest safe change and preserve:
+
+```text
+FastAPI
+→ FAISS
+→ NCERT context
+→ Gemini
+```
 
 ---
 
-## API Service Requirements
+## 6. FAISS
+
+The existing FAISS database belongs to the backend.
+
+The frontend must never:
+
+* import FAISS
+* access `index.faiss`
+* access `index.pkl`
+* load the database
+* search the database
+
+The browser communicates only with FastAPI.
+
+---
+
+## 7. Frontend Architecture
+
+Use the following architecture when appropriate:
+
+```text
+frontend/
+└── src/
+    ├── components/
+    │   ├── Layout.jsx
+    │   ├── Layout.css
+    │   ├── Header.jsx
+    │   ├── Header.css
+    │   ├── TopicChips.jsx
+    │   ├── TopicChips.css
+    │   ├── QuestionInput.jsx
+    │   ├── QuestionInput.css
+    │   ├── AnswerPanel.jsx
+    │   └── AnswerPanel.css
+    │
+    ├── pages/
+    │   ├── Home.jsx
+    │   └── Home.css
+    │
+    ├── services/
+    │   └── api.js
+    │
+    ├── styles/
+    │   └── global.css
+    │
+    ├── App.jsx
+    └── main.jsx
+```
+
+However:
+
+**Do not create every file blindly.**
+
+Reuse equivalent existing files if they already exist.
+
+---
+
+## 8. React Component Rules
+
+### App.jsx
+
+Keep it thin.
+
+It should primarily establish the root application structure.
+
+Do not put all tutoring logic into App.jsx.
+
+### Home.jsx
+
+Own:
+
+* question
+* answer
+* loading
+* error
+
+It should connect the UI to the API service.
+
+### Layout.jsx
+
+Own:
+
+* header
+* main content
+* footer
+* page shell
+
+It should not own API logic.
+
+### Header.jsx
+
+Display:
+
+* NCERT AI Tutor
+* AI Study Tutor
+* NCERT Grade 8 Science
+
+### TopicChips.jsx
+
+Provide useful Grade 8 Science example questions.
+
+Clicking one should populate the question input.
+
+### QuestionInput.jsx
+
+Provide:
+
+* textarea
+* placeholder
+* Ask Tutor button
+* validation
+* loading/disabled state
+
+Do not put direct API calls here.
+
+### AnswerPanel.jsx
+
+Support:
+
+* idle
+* loading
+* success
+* error
+
+Keep the answer readable.
+
+---
+
+## 9. API Service
 
 Create:
 
 ```text
-src/services/api.js
+frontend/src/services/api.js
 ```
 
-It should export a function similar to:
+if it does not exist.
 
-```javascript
-askQuestion(question)
+If it already exists, inspect and reuse it.
+
+It should call:
+
+```text
+POST http://127.0.0.1:8000/ask
 ```
 
-Requirements:
+with:
 
-* POST JSON
-* `Content-Type: application/json`
-* return parsed response JSON
-* handle network failure
-* handle non-2xx HTTP responses
-* use backend `detail` when present
+```json
+{
+  "question": "..."
+}
+```
 
-Do not include a Gemini API key.
+It should:
 
-Do not call Google APIs directly from React.
+* send JSON
+* set `Content-Type`
+* parse JSON
+* return the API response
+* handle network errors
+* handle non-2xx responses
+* display/use backend `detail` when available
+
+Do not place the Gemini API key in this file.
+
+Do not directly call Gemini from React.
 
 ---
 
-## UI Requirements
+## 10. Visual Design
 
-The application must clearly identify itself as:
+Use a clean dark theme.
 
-**NCERT Grade 8 Science**
+The design should feel:
 
-Suggested branding:
-
-**NCERT AI Tutor**
-
-Secondary label:
-
-**AI Study Tutor**
-
-The page should not look like a generic ChatGPT clone.
-
----
-
-## Visual Style
-
-Use a clean dark interface.
+* modern
+* professional
+* educational
+* calm
+* readable
 
 Prefer:
 
-* deep neutral background
-* elevated dark surfaces
-* warm educational accent
+* deep neutral backgrounds
+* dark elevated surfaces
 * restrained borders
+* warm accent color
 * subtle shadows
-* readable typography
-* generous whitespace
+* generous spacing
 
 Avoid:
 
-* excessive neon
 * excessive glow
-* loud gradients
-* decorative animations everywhere
-* oversized text
-* cluttered dashboards
+* cyberpunk aesthetics
+* huge gradients
+* excessive glass effects
+* excessive animation
+* clutter
 
 ---
 
-## Typography
+## 11. Typography
 
-Text must be comfortable to read for long study sessions.
+Prioritize long-session readability.
 
-Prioritize:
+Use:
 
-* readable body font
-* comfortable line-height
+* clear headings
+* readable body text
+* comfortable line height
 * sensible paragraph width
-* strong heading hierarchy
+* appropriate control sizes
 
-Do not use very small body text.
+Do not use tiny body text or extremely thin typography.
 
 ---
 
-## Global CSS
+## 12. CSS Architecture
 
-Put shared tokens in:
+Keep CSS separated by responsibility.
+
+Global variables belong in:
 
 ```text
-src/styles/global.css
+frontend/src/styles/global.css
 ```
 
 Use CSS custom properties for:
 
-```text
-colors
-spacing
-radius
-font sizes
-shadows
-transitions
-```
+* colors
+* spacing
+* radius
+* typography
+* shadows
+* focus states
+* status colors
 
-Avoid duplicating the same values everywhere.
+Component-specific styling belongs in component CSS files.
 
----
-
-## Header
-
-The Header should communicate:
-
-* NCERT AI Tutor
-* AI Study Tutor
-* Grade 8 · Science
-
-It should be minimal and polished.
+Do not create one massive stylesheet unless the existing project already uses that pattern and it is working well.
 
 ---
 
-## Topic Chips
-
-Provide useful example prompts grounded in Grade 8 Science.
-
-Examples:
-
-* What is force?
-* Explain pressure.
-* What is friction?
-* How does sound travel?
-* What is the function of the cell membrane?
-* Explain photosynthesis.
-* How is light reflected?
-* What are chemical effects of electric current?
-
-Clicking a topic should place the example into the question field.
-
----
-
-## Question Input
-
-Requirements:
-
-* textarea rather than a tiny single-line input
-* clear placeholder
-* Ask Tutor button
-* disabled state during loading
-* empty-input validation
-* keyboard-friendly behavior
-* responsive layout
-
-The input should feel like the main action of the application.
-
----
-
-## Answer Panel
-
-Must support:
-
-### Idle
-
-Explain that the student can ask a question.
-
-### Loading
-
-Show that the tutor is processing the request.
-
-### Success
-
-Present the answer in a highly readable format.
-
-### Error
-
-Show the error and provide an easy retry mechanism.
-
-The answer area must not become an unreadable wall of text.
-
----
-
-## Accessibility
+## 13. Accessibility
 
 Use:
 
 * semantic HTML
-* labels where appropriate
-* descriptive button text
-* visible focus indicators
-* accessible interactive elements
+* labels
+* accessible buttons
+* keyboard navigation
+* visible focus states
 * sufficient contrast
 
-Do not use color as the only indicator of success/error.
+Do not communicate success/error using color alone.
 
 ---
 
-## Responsive Behavior
+## 14. Responsive Design
 
-The page should work on:
+Support:
 
 * desktop
 * laptop
 * tablet
 * mobile
 
-At narrow widths:
+On smaller displays:
 
-* reduce horizontal padding
-* stack controls when appropriate
-* make the textarea full width
-* make buttons touch-friendly
-
----
-
-## Code Quality
-
-Write:
-
-* simple React functional components
-* clear prop names
-* sensible component boundaries
-* maintainable CSS
-* minimal comments
-
-Do not over-engineer.
-
-Do not generate unused abstractions.
-
-Do not add libraries simply to solve basic CSS/layout problems.
+* reduce outer padding
+* allow controls to stack
+* make textarea full width
+* keep buttons touch-friendly
+* prevent horizontal scrolling
 
 ---
 
-## Existing Vite Files
+## 15. Security
+
+Never expose:
+
+```text
+GOOGLE_API_KEY
+```
+
+in:
+
+* React
+* JSX
+* frontend JavaScript
+* frontend `.env`
+* public assets
+
+The Gemini API key stays on the Python backend.
+
+Never place FAISS files in the public frontend.
+
+---
+
+## 16. Existing Vite Files
 
 Inspect before replacing:
 
-* `main.jsx`
-* `App.jsx`
-* `index.css`
-* `App.css`
-* `vite.config.*`
+```text
+frontend/src/main.jsx
+frontend/src/App.jsx
+frontend/src/index.css
+frontend/src/App.css
+frontend/vite.config.*
+```
 
-Remove Vite starter references only when necessary.
+Remove starter references only when necessary.
 
-Do not damage the working Vite configuration.
+Do not damage the Vite setup.
 
 ---
 
-## Testing Requirements
+## 17. Testing
 
-After implementation:
+After implementation, run:
 
 ```bash
 npm run dev
@@ -448,16 +517,19 @@ npm run dev
 
 Confirm:
 
-* application loads
+* application launches
 * no compile errors
 * no import errors
-* UI responds to interaction
+* components render
+* CSS loads
 * topic chips work
-* loading works
+* question input works
+* loading state works
 * API request works
-* backend errors are displayed
+* success state works
+* error state works
 
-Backend should be run separately using:
+The backend may be run separately with:
 
 ```bash
 python -m uvicorn main:app --reload
@@ -465,34 +537,92 @@ python -m uvicorn main:app --reload
 
 ---
 
-## Security Rules
+## 18. Do Not Over-Engineer
 
-Never place:
+Use simple React functional components.
 
-```text
-GOOGLE_API_KEY
-```
+Do not add abstractions that are not needed.
 
-in React.
+Do not introduce libraries just for simple UI behavior.
 
-Never put the FAISS database in the public frontend.
+Do not implement:
 
-Never hard-code secrets into JSX, CSS, or JavaScript.
+* chat memory
+* authentication
+* database-backed users
+* quizzes
+* progress tracking
+* additional subjects
 
-The browser only communicates with FastAPI.
+unless explicitly requested.
+
+The current goal is the Grade 8 Science tutor.
 
 ---
 
-## Future Compatibility
+## 19. Completion Criteria
 
-Keep the current implementation easy to extend with:
+Before saying the task is complete, verify:
 
-* chat memory
-* chapter filters
-* source display
-* summaries
-* quizzes
-* bookmarks
-* progress tracking
+* the frontend runs
+* existing functionality remains intact
+* all imports work
+* API integration works
+* errors are handled
+* the layout is responsive
+* the design is cohesive
+* no secrets are exposed
+* no duplicate components were created
+* no unnecessary dependencies were added
 
-Do not implement those features yet unless explicitly instructed.
+Finally, report:
+
+1. Files created.
+2. Files modified.
+3. Files skipped because they were already correct.
+4. Dependencies installed or changed.
+5. Any remaining issues.
+
+**Primary rule: inspect → compare → skip completed work → fix partial work → create missing work → test.**
+
+## Existing Science Database — Canonical Reference
+
+The NCERT Grade 8 Science FAISS database has already been built successfully.
+
+Treat the existing Science implementation as the canonical reference for all future subject indexes.
+
+When modifying `Book_Summarizer.py`:
+
+1. Inspect how the existing Science index was created.
+2. Preserve its current chunking and indexing methodology.
+3. Generalize that implementation so it can be used for other subjects.
+
+The other subjects must use the same:
+
+- PDF extraction method
+- chunk size
+- chunk overlap
+- text formatting
+- embedding model
+- embedding batch size
+- retry/rate-limit handling
+- FAISS construction method
+- metadata/source handling
+
+Do not create a separate chunking strategy for Mathematics, Social Science, or English.
+
+IMPORTANT:
+
+Modify the indexing code only.
+
+DO NOT:
+
+- run the index builder
+- process the other textbooks
+- generate embeddings
+- call the Gemini embedding API
+- create new FAISS databases
+- rebuild the existing Science database
+- overwrite existing FAISS files
+
+The new subject indexes will be generated manually later.

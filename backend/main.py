@@ -52,42 +52,129 @@ app.add_middleware(
 
 
 # --------------------------------------------------
+# SUBJECT CONFIGURATION
+# --------------------------------------------------
+
+SUBJECTS = {
+    'science': {
+        'label': 'Science',
+        'embedding_model': 'models/gemini-embedding-001',
+        'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\science',
+        'system_instruction': (
+            "You are an expert AI tutor helping a student "
+            "study NCERT Grade 8 Science. "
+            "Answer strictly using the provided textbook context. "
+            "Be concise by default. Provide detailed explanations only when explicitly requested. "
+            "If the context does not contain the answer, politely say that you cannot find it in these documents."
+        )
+    },
+
+    'maths': {
+        'label': 'Mathematics',
+        'embedding_model': 'models/gemini-embedding-2',
+        'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\maths',
+        'system_instruction': (
+            "You are an expert AI tutor helping a student "
+            "study NCERT Grade 8 Mathematics. "
+            "Answer strictly using the provided textbook context. "
+            "Be concise by default. Provide detailed explanations only when explicitly requested. "
+            "If the context does not contain the answer, politely say that you cannot find it in these documents."
+        )
+    },
+
+    'social_science': {
+        'label': 'Social Science',
+        'embedding_model': 'models/gemini-embedding-2',
+        'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\social_science',
+        'system_instruction': (
+            "You are an expert AI tutor helping a student "
+            "study NCERT Grade 8 Social Science. "
+            "Answer strictly using the provided textbook context. "
+            "Be concise by default. Provide detailed explanations only when explicitly requested. "
+            "If the context does not contain the answer, politely say that you cannot find it in these documents."
+        )
+    },
+
+    'english': {
+        'label': 'English',
+        'embedding_model': 'models/gemini-embedding-001',
+        'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\english',
+        'system_instruction': (
+            "You are an expert AI tutor helping a student "
+            "study NCERT Grade 8 English. "
+            "Answer strictly using the provided textbook context. "
+            "Be concise by default. Provide detailed explanations only when explicitly requested. "
+            "If the context does not contain the answer, politely say that you cannot find it in these documents."
+        )
+    },
+}
+
+
+# --------------------------------------------------
 # REQUEST MODEL
 # --------------------------------------------------
 
 class QuestionRequest(BaseModel):
+    subject: str
     question: str
 
 
 # --------------------------------------------------
-# LOAD FAISS
+# LOAD FAISS DATABASES
 # --------------------------------------------------
 
-INDEX_FOLDER = r"E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db"
+DB_BASE_PATH = r"E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db"
 
-EMBEDDING_MODEL = "models/gemini-embedding-001"
 
-embeddings_model = GoogleGenerativeAIEmbeddings(
-    model=EMBEDDING_MODEL
-)
+vector_stores = {}
 
-try:
+for subject_id, config in SUBJECTS.items():
 
-    print("📁 Loading FAISS database...")
+    subject_path = config["index_folder"]
+    embedding_model = config["embedding_model"]
 
-    vector_store = FAISS.load_local(
-        INDEX_FOLDER,
-        embeddings_model,
-        allow_dangerous_deserialization=True
-    )
+    # Science currently exists in the old flat location.
+    if (
+        subject_id == "science"
+        and not os.path.exists(subject_path)
+    ):
+        subject_path = DB_BASE_PATH
 
-    print("✅ FAISS database loaded.")
+    if not os.path.exists(subject_path):
+        print(
+            f"⚠️ {config['label']} FAISS database "
+            f"not found at {subject_path}"
+        )
+        continue
 
-except Exception as e:
+    try:
+        print(
+            f"📁 Loading {config['label']} FAISS database..."
+        )
 
-    print(f"❌ Could not load FAISS database: {e}")
+        print(
+            f"🧠 Using embedding model: {embedding_model}"
+        )
 
-    vector_store = None
+        embeddings_model = GoogleGenerativeAIEmbeddings(
+            model=embedding_model
+        )
+
+        vector_stores[subject_id] = FAISS.load_local(
+            subject_path,
+            embeddings_model,
+            allow_dangerous_deserialization=True
+        )
+
+        print(
+            f"✅ {config['label']} FAISS database loaded."
+        )
+
+    except Exception as e:
+        print(
+            f"⚠️ Could not load "
+            f"{config['label']} FAISS database: {e}"
+        )
 
 
 # --------------------------------------------------
@@ -97,12 +184,24 @@ except Exception as e:
 @app.post("/ask")
 async def ask_question(request: QuestionRequest):
 
-    if vector_store is None:
+    subject = request.subject.strip().lower()
+    
+    # Validate subject
+    if subject not in SUBJECTS:
         raise HTTPException(
-            status_code=500,
-            detail="FAISS database is not loaded."
+            status_code=400,
+            detail=f"Invalid subject '{subject}'. Supported subjects: {', '.join(SUBJECTS.keys())}"
+        )
+    
+    # Check if subject database is available
+    if subject not in vector_stores or vector_stores[subject] is None:
+        subject_label = SUBJECTS[subject]['label']
+        raise HTTPException(
+            status_code=503,
+            detail=f"The {subject_label} NCERT database has not been built yet. Please try a different subject."
         )
 
+    vector_store = vector_stores[subject]
     query = request.question.strip()
 
     if not query:
@@ -133,21 +232,7 @@ async def ask_question(request: QuestionRequest):
     # GEMINI
     # ----------------------------------------------
 
-    system_instruction = (
-        "You are an expert AI tutor helping a student "
-        "study from NCERT textbooks. "
-
-        "Answer strictly using the provided textbook "
-        "context. "
-
-        "Be concise by default. Provide detailed "
-        "explanations only when explicitly requested. "
-
-        "If the context does not contain the answer, "
-        "politely say that you cannot find it in these "
-        "documents."
-    )
-
+    system_instruction = SUBJECTS[subject]['system_instruction']
 
     user_prompt = f"""
 Context from NCERT textbooks:
@@ -199,7 +284,6 @@ Student question:
 
 @app.get("/")
 def root():
-
     return {
         "status": "online",
         "message": "NCERT AI Tutor API is running"

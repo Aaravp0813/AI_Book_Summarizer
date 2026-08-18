@@ -5,7 +5,7 @@ import AnswerPanel from '../components/AnswerPanel';
 import { askQuestion } from '../services/api';
 import './Home.css';
 
-export default function Home() {
+export default function Home({ subject, onChangeSubject }) {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [state, setState] = useState('idle'); // 'idle', 'loading', 'success', 'error'
@@ -35,7 +35,7 @@ export default function Home() {
     setAnswer('');
 
     try {
-      const response = await askQuestion(trimmedQuestion);
+      const response = await askQuestion(subject, trimmedQuestion);
       setQuestion(response.question);
       setAnswer(response.answer);
       setState('success');
@@ -52,7 +52,7 @@ export default function Home() {
   return (
     <div className="home-page">
       <div className="home-container">
-        <TopicChips onTopicClick={handleTopicClick} />
+        <TopicChips subject={subject} onTopicClick={handleTopicClick} />
 
         <QuestionInput
           value={question}

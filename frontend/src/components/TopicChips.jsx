@@ -1,22 +1,15 @@
 import './TopicChips.css';
+import { getSubject } from '../config/subjects';
 
-const TOPICS = [
-  'What is force?',
-  'Explain pressure.',
-  'What is friction?',
-  'How does sound travel?',
-  'What is the function of the cell membrane?',
-  'Explain photosynthesis.',
-  'How is light reflected?',
-  'What are chemical effects of electric current?',
-];
+export default function TopicChips({ subject, onTopicClick }) {
+  const subjectInfo = getSubject(subject);
+  const topics = subjectInfo?.topics || [];
 
-export default function TopicChips({ onTopicClick }) {
   return (
     <div className="topic-chips-container">
       <p className="topic-chips-label">Try asking about these topics:</p>
       <div className="topic-chips">
-        {TOPICS.map((topic) => (
+        {topics.map((topic) => (
           <button
             key={topic}
             className="chip"
