@@ -55,18 +55,23 @@ app.add_middleware(
 # SUBJECT CONFIGURATION
 # --------------------------------------------------
 
+COMMON_INSTRUCTIONS = (
+    "You are an expert AI tutor helping a student study NCERT Grade 8.",
+    "Do not use LaTeX formatting, math mode blocks, or LaTeX commands.",
+    "Always insert actual raw Unicode symbols directly into the text.",
+    "Answer strictly using the provided textbook context.",
+    "Be concise by default.",
+    "Provide detailed explanations only when explicitly requested.",
+    "If the context does not contain the answer, politely say that you cannot find it in these documents."
+)
+
 SUBJECTS = {
     'science': {
         'label': 'Science',
         'embedding_model': 'models/gemini-embedding-001',
         'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\science',
         'system_instruction': (
-            "You are an expert AI tutor helping a student "
-            "study NCERT Grade 8 Science. "
-            "Do not use LaTeX formatting, math mode blocks, or LaTeX commands. Instead, always insert the actual, raw Unicode symbol character directly into the text."
-            "Answer strictly using the provided textbook context. "
-            "Be concise by default. Provide detailed explanations only when explicitly requested. "
-            "If the context does not contain the answer, politely say that you cannot find it in these documents."
+            "study NCERT Grade 8 Science.",
         )
     },
 
@@ -75,12 +80,7 @@ SUBJECTS = {
         'embedding_model': 'models/gemini-embedding-2',
         'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\maths',
         'system_instruction': (
-            "You are an expert AI tutor helping a student "
-            "study NCERT Grade 8 Mathematics. "
-            "Do not use LaTeX formatting, math mode blocks, or LaTeX commands. Instead, always insert the actual, raw Unicode symbol character directly into the text."
-            "Answer strictly using the provided textbook context. "
-            "Be concise by default. Provide detailed explanations only when explicitly requested. "
-            "If the context does not contain the answer, politely say that you cannot find it in these documents."
+            "study NCERT Grade 8 Mathematics.",
         )
     },
 
@@ -89,12 +89,7 @@ SUBJECTS = {
         'embedding_model': 'models/gemini-embedding-001',
         'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\social_science',
         'system_instruction': (
-            "You are an expert AI tutor helping a student "
-            "study NCERT Grade 8 Social Science. "
-            "Do not use LaTeX formatting, math mode blocks, or LaTeX commands. Instead, always insert the actual, raw Unicode symbol character directly into the text."
-            "Answer strictly using the provided textbook context. "
-            "Be concise by default. Provide detailed explanations only when explicitly requested. "
-            "If the context does not contain the answer, politely say that you cannot find it in these documents."
+            "study NCERT Grade 8 Social Science.",
         )
     },
 
@@ -103,12 +98,7 @@ SUBJECTS = {
         'embedding_model': 'models/gemini-embedding-001',
         'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\english',
         'system_instruction': (
-            "You are an expert AI tutor helping a student "
-            "study NCERT Grade 8 English. "
-            "Do not use LaTeX formatting, math mode blocks, or LaTeX commands. Instead, always insert the actual, raw Unicode symbol character directly into the text."
-            "Answer strictly using the provided textbook context. "
-            "Be concise by default. Provide detailed explanations only when explicitly requested. "
-            "If the context does not contain the answer, politely say that you cannot find it in these documents."
+            "study NCERT Grade 8 English.",
         )
     },
 }
@@ -236,7 +226,10 @@ async def ask_question(request: QuestionRequest):
     # GEMINI
     # ----------------------------------------------
 
-    system_instruction = SUBJECTS[subject]['system_instruction']
+    system_instruction = " ".join(
+    COMMON_INSTRUCTIONS +
+    SUBJECTS[subject]['system_instruction']
+)
 
     user_prompt = f"""
 Context from NCERT textbooks:
