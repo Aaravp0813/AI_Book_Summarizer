@@ -527,7 +527,7 @@ SUBJECTS = {
     'social_science': {
         'label': 'Social Science',
         'description': 'NCERT Grade 8 Social Science',
-        "embedding_model": "models/gemini-embedding-2",
+        "embedding_model": "models/gemini-embedding-001",
     },
     'english': {
         'label': 'English',
@@ -825,8 +825,8 @@ if __name__ == "__main__":
     """
 
     build_subject_index(
-        subject_id='maths',
-        zip_path='E:/My_Projects/NCERT_maths_textbook.zip',
+        subject_id='social_science',
+        zip_path='E:/My_Projects/NCERT_social_science_textbook.zip',
         output_dir='./faiss_ncert_db')
 
     target_folder = r"E:\My_Projects"
