@@ -3,7 +3,7 @@
  * Communicates with FastAPI backend at http://127.0.0.1:8000
  */
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = 'aibooksummarizer-production.up.railway.app';
 
 /**
  * Ask a question to the tutor
