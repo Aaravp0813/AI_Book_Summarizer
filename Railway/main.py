@@ -44,6 +44,7 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:5174",
         "https://ai-book-summarizer-blue.vercel.app/",
+        "https://ai-book-summarizer-blue.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
