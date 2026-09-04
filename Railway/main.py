@@ -43,7 +43,6 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:5174",
-        "http://localhost:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -69,7 +68,7 @@ SUBJECTS = {
     'science': {
         'label': 'Science',
         'embedding_model': 'models/gemini-embedding-001',
-        'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\science',
+        'index_folder': r'./faiss_ncert_db/science',
         'system_instruction': (
             "study NCERT Grade 8 Science.",
         )
@@ -78,7 +77,7 @@ SUBJECTS = {
     'maths': {
         'label': 'Mathematics',
         'embedding_model': 'models/gemini-embedding-2',
-        'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\maths',
+        'index_folder': r'./faiss_ncert_db/maths',
         'system_instruction': (
             "study NCERT Grade 8 Mathematics.",
         )
@@ -87,7 +86,7 @@ SUBJECTS = {
     'social_science': {
         'label': 'Social Science',
         'embedding_model': 'models/gemini-embedding-001',
-        'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\social_science',
+        'index_folder': r'./faiss_ncert_db/social_science',
         'system_instruction': (
             "study NCERT Grade 8 Social Science.",
         )
@@ -96,7 +95,7 @@ SUBJECTS = {
     'english': {
         'label': 'English',
         'embedding_model': 'models/gemini-embedding-001',
-        'index_folder': r'E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db\english',
+        'index_folder': r'./faiss_ncert_db/english',
         'system_instruction': (
             "study NCERT Grade 8 English.",
         )
@@ -117,7 +116,7 @@ class QuestionRequest(BaseModel):
 # LOAD FAISS DATABASES
 # --------------------------------------------------
 
-DB_BASE_PATH = r"E:\My_Projects\AI_Book_Summarizer\faiss_ncert_db"
+DB_BASE_PATH = r"./faiss_ncert_db"
 
 
 vector_stores = {}

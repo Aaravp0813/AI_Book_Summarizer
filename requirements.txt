@@ -1,0 +1,7 @@
+fastapi==0.139.2
+uvicorn==0.49.0
+python-dotenv==1.2.2
+google-genai==2.9.0
+langchain-google-genai==4.2.5
+langchain-community==0.4.2
+faiss-cpu==1.14.3
